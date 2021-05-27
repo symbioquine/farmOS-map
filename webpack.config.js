@@ -1,33 +1,29 @@
 const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const SaveRemoteFilePlugin = require('save-remote-file-webpack-plugin');
+const { ModuleFederationPlugin } = require('webpack').container;
 
 const info = require('./package.json');
 
 module.exports = {
   entry: {
-    'farmOS-map': {
-      'import': `${__dirname}/src/main.js`,
-      library: {
-        name: ['farmOS', 'map'],
-        type: 'global',
-        'export': 'default',
-      },
-    },
+    // we add an entrypoint with the same name as our name in ModuleFederationPlugin.
+    // This merges the two "chunks" together. When a remoteEntry is placed on the page,
+    // the code in this 'farmOS-map' entrypoint will execute as part of the remoteEntry startup.
+    'farmOS-map': `${__dirname}/src/main.js`,
   },
   output: {
     path: `${__dirname}/dist`,
     filename: '[name].js',
+    clean: true,
   },
   optimization: {
     splitChunks: {
-      // Setting this to 1MB rather than the default of 50KB to avoid
-      // Random vendor chunks being generated
-      enforceSizeThreshold: 1024 * 1024,
+      chunks: 'all',
     },
   },
   performance: {
-    hints: false,
+    hints: 'warning',
   },
   module: {
     rules: [
@@ -44,34 +40,25 @@ module.exports = {
     new webpack.BannerPlugin(`farmOS-map ${info.version}`),
     new SaveRemoteFilePlugin([
       {
-          url: 'https://raw.githubusercontent.com/openlayers/openlayers.github.io/master/en/v6.5.0/build/ol.js',
-          filepath: 'ol.js',
-          hash: false,
-      },
-      {
         url: 'https://raw.githubusercontent.com/openlayers/openlayers.github.io/master/en/v6.5.0/css/ol.css',
         filepath: 'ol.css',
         hash: false,
       },
     ]),
+    new ModuleFederationPlugin({
+      name: 'farmOS-map',
+      library: {
+        type: 'assign-properties',
+        name: ['farmOS', 'map', 'container'],
+      },
+      shared: [
+        'ol'
+      ],
+    }),
     new CopyWebpackPlugin({
       patterns: [
         { from: './examples/simple-html-consumer/static' },
       ],
     }),
   ],
-  externals: function ({context, request}, callback) {
-    // Externalize all OpenLayers `ol` imports
-    if (/^ol(\/.*)?$/.test(request)) {
-      const modifiedRequest = request
-        // Remove '.js' suffix - if present
-        .replace(/\.js$/, "")
-        // Replace filesystem separators '/' with module separators '.'
-        .replace(/\//g, ".");
-      return callback(null, modifiedRequest);
-    }
-
-    // Continue without externalizing the import
-    callback();
-  },
 };

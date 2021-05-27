@@ -24,15 +24,15 @@ const TEST_SCENARIOS = {
     'uploadThroughput': 3 * 1024 * 1024 / 8,
     'latency': 20
   }),
-  'DSL': createNetworkThrottledScenario({
-    'offline': false,
-    'downloadThroughput': 2 * 1024 * 1024 / 8,
-    'uploadThroughput': 1 * 1024 * 1024 / 8,
-    'latency': 5
-  }),
-  'SlowCPU': async (page, client) => {
-    await client.send('Emulation.setCPUThrottlingRate', { rate: 8 });
-  },
+//  'DSL': createNetworkThrottledScenario({
+//    'offline': false,
+//    'downloadThroughput': 2 * 1024 * 1024 / 8,
+//    'uploadThroughput': 1 * 1024 * 1024 / 8,
+//    'latency': 5
+//  }),
+//  'SlowCPU': async (page, client) => {
+//    await client.send('Emulation.setCPUThrottlingRate', { rate: 8 });
+//  },
 }
 
 beforeAll(async () => {
