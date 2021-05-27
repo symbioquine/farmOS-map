@@ -36,8 +36,8 @@ exampleApps.forEach((app) => {
       expect(result).toEqual(true);
     }, 60 * 1000);
 
-    describe(`get metrics from 10 perf.test.js runs`, () => {
-      for (let index = 0; index < 10; index++) {
+    describe(`get metrics from 3 perf.test.js runs`, () => {
+      for (let index = 0; index < 3; index++) {
         it(`${app} run #${index}`, async () => {
           const env = Object.assign({}, process.env);
           env.TEST_PORT_NUM = await getPort({port: getPort.makeRange(3000, 3100)});

@@ -22,6 +22,11 @@ module.exports = {
   plugins: [
     new ModuleFederationPlugin({
       name: 'farmOS-map-example-ext-behavior',
+      remotes: {
+        // Expect the farmOS-map `farmOS-map.js` entrypoint to be in the same location
+        // as this example's JS
+        'farmOS-map': `farmOS-map@./farmOS-map.js`,
+      },
       shared: [
         'ol'
       ],
