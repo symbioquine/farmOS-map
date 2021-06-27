@@ -28,6 +28,10 @@ import {
   PinchRotate,
 } from 'ol/interaction';
 
+// Import ol-side-panel control.
+import 'ol-side-panel/dist/ol-side-panel.css';
+import { SidePanel } from 'ol-side-panel';
+
 // Import Geolocate control.
 import Geolocate from '../control/Geolocate/Geolocate';
 
@@ -68,6 +72,7 @@ const defaults = {
         limit: 5,
         autoComplete: true,
       }),
+      new SidePanel(),
     ];
 
     // If controls were set to 'false', don't attach any controls.

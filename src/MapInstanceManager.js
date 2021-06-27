@@ -24,6 +24,7 @@ class MapInstanceManager {
     // instances.
     this.behaviors = {
       rememberLayer: namedBehaviors.rememberLayer,
+      layerSwitcherInSidePanel: namedBehaviors.layerSwitcherInSidePanel,
     };
 
   }

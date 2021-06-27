@@ -71,3 +71,21 @@
 .layer-switcher.shown {
   max-height: 300px;
 }
+
+.ol-side-panel-pane .layer-switcher {
+  left: 0px;
+}
+
+.ol-side-panel-pane .layer-switcher > ul {
+  margin-top: 0px;
+}
+
+.ol-side-panel-tabs button svg {
+  margin: 5px;
+  width: 28px;
+}
+
+.ol-side-panel-tabs button.active {
+  background-color: #ffcc33;
+  background-color: rgba(255,204,51,0.7);
+}
