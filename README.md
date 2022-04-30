@@ -340,7 +340,7 @@ A `farmOS-map.popup` observable event is dispatched when the popup is displayed.
 You can use this to perform additional actions. For example:
 
 ```js
-popup.on('farmOS-map.popup', function (event) {
+myMap.on('farmOS-map.popup', function (event) {
   console.log('Event: farmOS-map.popup');
 });
 ```

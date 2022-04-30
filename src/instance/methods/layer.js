@@ -1,8 +1,6 @@
 // Import source types, layer types, and formats.
 import VectorSource from 'ol/source/Vector';
 import Cluster from 'ol/source/Cluster';
-import TileArcGISRest from 'ol/source/TileArcGISRest';
-import TileWMS from 'ol/source/TileWMS';
 import XYZ from 'ol/source/XYZ';
 import LayerGroup from 'ol/layer/Group';
 import VectorLayer from 'ol/layer/Vector';
@@ -109,17 +107,29 @@ function addTileArcGISMapServerLayer({
   title = 'arcgis-tile', url, params, visible = true, base = false, attribution = '',
 }) {
   const attributions = [attribution];
-  const source = new TileArcGISRest({
-    url,
-    params,
-    attributions,
-  });
+
   const layer = new TileLayer({
     title,
-    source,
+
+    // Source is set once the OpenLayers support for this layer type loads asynchronously.
+    source: null,
+
     visible,
     type: base ? 'base' : 'normal',
   });
+
+  import(/* webpackChunkName: "farmOS-map-source-TileArcGISRest" */ 'ol/source/TileArcGISRest').then((module) => {
+    const TileArcGISRest = module.default;
+
+    const source = new TileArcGISRest({
+      url,
+      params,
+      attributions,
+    });
+
+    layer.setSource(source);
+  });
+
   return layer;
 }
 
@@ -156,17 +166,29 @@ function addWMSTileLayer({
   title = 'wms', url, params, visible = true, base = false, attribution = '',
 }) {
   const attributions = [attribution];
-  const source = new TileWMS({
-    url,
-    params,
-    attributions,
-  });
+
   const layer = new TileLayer({
     title,
-    source,
+
+    // Source is set once the OpenLayers support for this layer type loads asynchronously.
+    source: null,
+
     visible,
     type: base ? 'base' : 'normal',
   });
+
+  import(/* webpackChunkName: "farmOS-map-source-TileWMS" */ 'ol/source/TileWMS').then((module) => {
+    const TileWMS = module.default;
+
+    const source = new TileWMS({
+      url,
+      params,
+      attributions,
+    });
+
+    layer.setSource(source);
+  });
+
   return layer;
 }
 
