@@ -5,8 +5,24 @@ import XYZ from 'ol/source/XYZ';
 import LayerGroup from 'ol/layer/Group';
 import VectorLayer from 'ol/layer/Vector';
 import TileLayer from 'ol/layer/Tile';
+import WebGLTileLayer from 'ol/layer/WebGLTile';
 import GeoJSON from 'ol/format/GeoJSON';
 import WKT from 'ol/format/WKT';
+
+// TODO: Not sure if we actually need this projection stuff or - if so - where it should live
+// Ref: https://openlayers.org/en/latest/doc/tutorials/raster-reprojection.html
+// Ref: https://epsg.io/32636
+import proj4 from 'proj4';
+import {get as getProjection} from 'ol/proj';
+import {register} from 'ol/proj/proj4';
+
+proj4.defs("EPSG:32636","+proj=utm +zone=36 +datum=WGS84 +units=m +no_defs");
+register(proj4);
+var proj32636 = getProjection('EPSG:32636');
+proj32636.setExtent([
+  166021.44, 0.00,
+  534994.66, 9329005.18
+]);
 
 // Import setWithCredentials function.
 import { setWithCredentials } from 'ol/featureloader';
@@ -124,6 +140,43 @@ function addTileArcGISMapServerLayer({
     const source = new TileArcGISRest({
       url,
       params,
+      attributions,
+    });
+
+    layer.setSource(source);
+  });
+
+  return layer;
+}
+
+// Add a Tile GeoTIFF layer to the map.
+function addTileGeoTIFFLayer({
+  title = 'geotiff', url, sourceOptions = null, visible = true, base = false, attribution = '',
+}) {
+  const attributions = [attribution];
+
+  const layer = new TileLayer({
+    title,
+
+    // Source is set once the OpenLayers support for this layer type loads asynchronously.
+    source: null,
+
+    visible,
+    type: base ? 'base' : 'normal',
+  });
+
+  import(/* webpackChunkName: "farmOS-map-source-GeoTIFF" */ 'ol/source/GeoTIFF').then((module) => {
+    const GeoTIFF = module.default;
+
+    const source = new GeoTIFF({
+      sources: [
+        {
+          url,
+        },
+      ],
+      sourceOptions: (sourceOptions || undefined),
+      // TODO: Hack - just testing if specifying the source projection is necessary and/or helps
+      projection: "EPSG:32636",
       attributions,
     });
 
@@ -257,6 +310,12 @@ export default function addLayer(type, opts = {}) {
       throw new Error('Missing a ArcGIS MapServer url.');
     }
     layer = addTileArcGISMapServerLayer(opts);
+  }
+  if (type.toLowerCase() === 'geotiff') {
+    if (!opts.url) {
+      throw new Error('Missing a GeoTIFF url.');
+    }
+    layer = addTileGeoTIFFLayer(opts);
   }
   if (type.toLowerCase() === 'wkt') {
     if (!opts.wkt) {
